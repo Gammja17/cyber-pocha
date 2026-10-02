@@ -20,7 +20,6 @@ BigSoundBank 라이선스: 상업·비상업 모두 무료 사용 가능 (https:
 | `door_chime.mp3` | Doorbell #6 (2365) |
 | `plastic_bag.mp3` | Pack of chips, manipulation #1 (1433) |
 | `crowd_cheer.mp3` | Applause Concert Bar #1 (2479) |
-| `laugh.mp3` | Strident Laughter (0489) |
 | `car_pass.mp3` | Car passing 50km/h #3 (2987) |
 | `footsteps.mp3` | Footsteps, Shoe on Concrete (0514) |
 | `meow.mp3` | Meow Cat #2 (1890) |

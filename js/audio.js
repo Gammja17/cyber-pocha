@@ -2,7 +2,7 @@
 const SOUNDS = [
   'ambient_pocha', 'ambient_pub', 'ambient_store',
   'chair_scrape', 'clink', 'pour', 'can_open', 'sip', 'bite', 'serve', 'call_bell',
-  'lighter', 'door_chime', 'plastic_bag', 'crowd_cheer', 'laugh', 'car_pass', 'footsteps', 'meow',
+  'lighter', 'door_chime', 'plastic_bag', 'crowd_cheer', 'car_pass', 'footsteps', 'meow',
 ];
 
 // 원본이 긴 효과음은 쓸 구간만 재생: [시작초, 길이초] (여러 개면 랜덤)
@@ -17,15 +17,14 @@ const CLIPS = {
   lighter: [[0, 2.0]],
   door_chime: [[0, 2.5]],
   plastic_bag: [[2.0, 1.8], [9.8, 1.2]],
-  laugh: [[0, 3.0]],
   car_pass: [[3.5, 6.0]],
   footsteps: [[0, 3.0]],
 };
 
 // 장소별 분위기: 배경 루프 볼륨 + 가끔 나는 소리 [이름, 최소초, 최대초, 볼륨]
 const VENUE_SOUND = {
-  pocha: { loop: 'ambient_pocha', vol: 0.45, random: [['laugh', 15, 40, 0.25], ['clink', 8, 25, 0.12], ['chair_scrape', 25, 60, 0.15]] },
-  pub: { loop: 'ambient_pub', vol: 0.7, random: [['crowd_cheer', 20, 50, 0.35], ['clink', 5, 15, 0.2], ['laugh', 8, 20, 0.3], ['call_bell', 20, 45, 0.2]] },
+  pocha: { loop: 'ambient_pocha', vol: 0.45, random: [['clink', 8, 25, 0.12], ['chair_scrape', 25, 60, 0.15]] },
+  pub: { loop: 'ambient_pub', vol: 0.7, random: [['crowd_cheer', 20, 50, 0.35], ['clink', 5, 15, 0.2], ['call_bell', 20, 45, 0.2]] },
   store: { loop: 'ambient_store', vol: 0.3, random: [['chair_scrape', 18, 45, 0.35], ['car_pass', 25, 70, 0.3], ['door_chime', 30, 80, 0.15]] },
 };
 
