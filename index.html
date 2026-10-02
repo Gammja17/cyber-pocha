@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>사이버 포차</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gowun+Dodum&family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <!-- 로비 -->
+  <section id="lobby">
+    <div class="lobby-card">
+      <div class="lantern">🏮</div>
+      <h1>사이버 포차</h1>
+      <p class="sub">야장 · 편의점 앞 · 시끌벅적 호프<br />친구들끼리 한잔 하자 (최대 6명)</p>
+      <form id="joinForm">
+        <label>이름<input id="nameInput" maxlength="12" placeholder="뭐라고 부를까" required /></label>
+        <label>방 코드<input id="roomInput" maxlength="6" placeholder="비우면 새 방 만들기" /></label>
+        <button type="submit" id="joinBtn">자리 잡기 🍶</button>
+      </form>
+      <p class="tip">🎤 마이크 권한을 허용하면 음성으로 대화할 수 있어요</p>
+    </div>
+  </section>
+
+  <!-- 술자리 -->
+  <section id="app" hidden>
+    <div id="view"></div>
+    <div id="fade"></div>
+
+    <header id="topbar">
+      <div class="place">
+        <span id="roundTag">1차</span>
+        <strong id="venueName">을지로 야장</strong>
+      </div>
+      <button id="inviteBtn" class="ghost" title="초대 링크 복사">방 <b id="roomCode">----</b> · 초대링크 복사</button>
+      <ul id="memberList"></ul>
+    </header>
+
+    <div id="banner"></div>
+    <div id="feed"></div>
+    <div id="awayNote"></div>
+
+    <div id="chat">
+      <div id="chatLog"></div>
+      <form id="chatForm"><input id="chatInput" maxlength="200" placeholder="Enter로 채팅…" autocomplete="off" /></form>
+    </div>
+
+    <div id="hint">드래그로 둘러보기 · 안주 클릭 = 한입 · 술 클릭 = 내 잔에 따르기 · 내 잔 클릭 = 홀짝</div>
+
+    <nav id="actions">
+      <button id="orderBtn"><i>🍽️</i><span>주문</span></button>
+      <button id="toastBtn"><i>🍻</i><span>짠!</span></button>
+      <button id="smokeBtn"><i>🚬</i><span>한대</span></button>
+      <button id="moveBtn"><i>🚶</i><span>2차 가자</span></button>
+      <button id="endBtn"><i>🧾</i><span>계산</span></button>
+      <button id="micBtn"><i>🎤</i><span>마이크</span></button>
+      <label class="vol" title="주변 소음"><i>🔊</i><input id="ambientVol" type="range" min="0" max="1" step="0.05" value="1" /></label>
+    </nav>
+
+    <!-- 메뉴 -->
+    <div class="modal" id="menuModal" hidden>
+      <div class="sheet">
+        <h2 id="menuTitle">메뉴판</h2>
+        <ul id="menuList"></ul>
+        <div class="cart"><span id="cartText">담은 거 없음</span><b id="cartTotal">0원</b></div>
+        <div class="row">
+          <button class="ghost" data-close>닫기</button>
+          <button id="orderSubmit">주문하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2차 장소 선택 -->
+    <div class="modal" id="moveModal" hidden>
+      <div class="sheet">
+        <h2>어디로 갈까?</h2>
+        <div id="venueChoices"></div>
+        <div class="row"><button class="ghost" data-close>안 가</button></div>
+      </div>
+    </div>
+
+    <!-- 투표 -->
+    <div class="modal" id="voteModal" hidden>
+      <div class="sheet vote">
+        <h2 id="voteTitle"></h2>
+        <p id="voteStatus"></p>
+        <div class="timer"><div id="voteTimer"></div></div>
+        <div class="row" id="voteButtons">
+          <button class="ghost" id="voteNo">난 빠질래</button>
+          <button id="voteYes">콜!</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 영수증 -->
+  <div class="modal" id="receiptModal" hidden>
+    <div class="receipt-wrap">
+      <div class="receipt" id="receipt"></div>
+      <button id="receiptClose">집에 가자 🏠</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

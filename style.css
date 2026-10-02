@@ -1,0 +1,135 @@
+:root {
+  --bg: #0d0f17;
+  --panel: rgba(16, 18, 28, 0.72);
+  --line: rgba(255, 255, 255, 0.12);
+  --text: #f3eee4;
+  --muted: #a7a3b5;
+  --accent: #ff8a3d;
+  --accent2: #ffd166;
+  --good: #5fd37a;
+  --bad: #ff6b6b;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font-family: 'Gowun Dodum', 'Malgun Gothic', sans-serif; overflow: hidden; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; }
+[hidden] { display: none !important; }
+
+/* ---------- 로비 ---------- */
+#lobby {
+  position: fixed; inset: 0; display: grid; place-items: center; padding: 16px;
+  background: radial-gradient(ellipse at 50% 20%, #3a1c0e 0%, #120b10 55%, #07070c 100%);
+}
+.lobby-card { width: min(380px, 100%); text-align: center; }
+.lantern { font-size: 64px; filter: drop-shadow(0 0 24px #ff6a00); animation: sway 3s ease-in-out infinite; transform-origin: top center; }
+@keyframes sway { 50% { transform: rotate(6deg); } }
+h1 { font-family: 'Do Hyeon', sans-serif; font-size: 48px; margin: 8px 0 4px; color: var(--accent2); text-shadow: 0 0 18px rgba(255, 138, 61, 0.6); }
+.sub { color: var(--muted); line-height: 1.6; margin: 0 0 24px; }
+#joinForm { display: grid; gap: 12px; text-align: left; }
+#joinForm label { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+input { font: inherit; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255, 255, 255, 0.06); color: var(--text); outline: none; }
+input:focus { border-color: var(--accent); }
+#joinBtn, #orderSubmit, #voteYes, #receiptClose {
+  padding: 14px; border-radius: 14px; font-size: 18px; font-family: 'Do Hyeon', sans-serif;
+  background: linear-gradient(180deg, #ff9a4d, #e8641e); color: #fff; box-shadow: 0 6px 20px rgba(232, 100, 30, 0.35);
+}
+.ghost { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.tip { color: var(--muted); font-size: 13px; margin-top: 18px; }
+
+/* ---------- 술자리 ---------- */
+#app { position: fixed; inset: 0; }
+#view { position: absolute; inset: 0; }
+#view canvas { display: block; touch-action: none; cursor: grab; }
+#fade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; transition: opacity 0.8s; }
+#fade.on { opacity: 1; }
+
+#topbar { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; pointer-events: none; }
+#topbar > * { pointer-events: auto; }
+.place { background: var(--panel); backdrop-filter: blur(8px); padding: 8px 14px; border-radius: 12px; border: 1px solid var(--line); display: flex; gap: 8px; align-items: center; }
+.place strong { font-family: 'Do Hyeon', sans-serif; font-size: 20px; font-weight: 400; }
+#roundTag { background: var(--accent); color: #fff; font-size: 13px; padding: 2px 8px; border-radius: 99px; }
+#inviteBtn { background: var(--panel); backdrop-filter: blur(8px); font-size: 13px; }
+#memberList { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
+#memberList li { background: var(--panel); backdrop-filter: blur(8px); border: 1px solid var(--line); border-radius: 99px; padding: 5px 10px 5px 6px; font-size: 13px; display: flex; align-items: center; gap: 6px; transition: box-shadow 0.1s; }
+#memberList li .dot { width: 14px; height: 14px; border-radius: 50%; }
+#memberList li.talking { box-shadow: 0 0 0 2px var(--good); }
+#memberList li .st { color: var(--muted); }
+
+#banner { position: absolute; top: 72px; left: 50%; transform: translateX(-50%) scale(0.9); opacity: 0; transition: 0.25s; background: rgba(255, 138, 61, 0.92); color: #fff; padding: 10px 20px; border-radius: 99px; font-family: 'Do Hyeon', sans-serif; font-size: 22px; pointer-events: none; white-space: nowrap; max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis; }
+#banner.show { opacity: 1; transform: translateX(-50%) scale(1); }
+
+#feed { position: absolute; right: 12px; top: 120px; width: min(260px, 50vw); display: flex; flex-direction: column; gap: 4px; align-items: flex-end; pointer-events: none; }
+#feed div { background: var(--panel); padding: 5px 10px; border-radius: 10px; font-size: 13px; animation: feedIn 0.25s, feedOut 0.6s 4.4s forwards; }
+@keyframes feedIn { from { opacity: 0; transform: translateX(20px); } }
+@keyframes feedOut { to { opacity: 0; } }
+
+#awayNote { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, 0.55); font-family: 'Do Hyeon', sans-serif; font-size: 30px; pointer-events: none; opacity: 0; transition: opacity 0.5s; text-align: center; padding: 16px; }
+#awayNote.on { opacity: 1; }
+
+#chat { position: absolute; left: 12px; bottom: 92px; width: min(340px, calc(100% - 24px)); display: flex; flex-direction: column; gap: 6px; }
+#chatLog { max-height: 30vh; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; font-size: 14px; mask-image: linear-gradient(to bottom, transparent, #000 25%); padding-top: 20px; }
+#chatLog div { background: rgba(0, 0, 0, 0.45); padding: 4px 9px; border-radius: 8px; align-self: flex-start; max-width: 100%; word-break: break-all; }
+#chatLog div b { margin-right: 6px; }
+#chatLog div.sys { color: var(--accent2); background: rgba(0, 0, 0, 0.3); font-size: 12px; }
+#chatInput { width: 100%; background: var(--panel); backdrop-filter: blur(8px); }
+
+#hint { position: absolute; bottom: 74px; left: 50%; transform: translateX(-50%); font-size: 12px; color: rgba(255, 255, 255, 0.55); white-space: nowrap; pointer-events: none; }
+
+#actions { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; background: var(--panel); backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 18px; padding: 6px; max-width: calc(100% - 24px); overflow-x: auto; }
+#actions button, #actions .vol { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; border-radius: 12px; background: transparent; min-width: 58px; font-size: 12px; white-space: nowrap; }
+#actions button:hover { background: rgba(255, 255, 255, 0.1); }
+#actions button i, #actions .vol i { font-style: normal; font-size: 22px; }
+#actions button:disabled { opacity: 0.35; cursor: default; }
+#actions button.off i { filter: grayscale(1); opacity: 0.5; }
+#actions button.pulse { background: var(--accent); animation: pulse 0.5s infinite alternate; }
+@keyframes pulse { to { transform: scale(1.08); } }
+#actions .vol input { width: 70px; padding: 0; accent-color: var(--accent); }
+
+/* ---------- 모달 ---------- */
+.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: grid; place-items: center; padding: 16px; z-index: 10; }
+.sheet { width: min(420px, 100%); max-height: 90vh; overflow-y: auto; background: #1b1d29; border: 1px solid var(--line); border-radius: 20px; padding: 20px; }
+.sheet h2 { font-family: 'Do Hyeon', sans-serif; font-weight: 400; margin: 0 0 14px; font-size: 26px; }
+.row { display: flex; gap: 8px; margin-top: 14px; }
+.row > * { flex: 1; }
+#menuList { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+#menuList li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(255, 255, 255, 0.04); border-radius: 12px; }
+#menuList li .nm { flex: 1; }
+#menuList li .pr { color: var(--muted); font-size: 14px; }
+#menuList li .qty { display: flex; align-items: center; gap: 6px; }
+#menuList li .qty button { width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); }
+#menuList li .qty b { min-width: 16px; text-align: center; }
+.cart { display: flex; justify-content: space-between; margin-top: 12px; padding: 10px 12px; background: rgba(255, 138, 61, 0.12); border-radius: 12px; font-size: 14px; }
+#venueChoices { display: grid; gap: 8px; }
+#venueChoices button { text-align: left; padding: 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line); }
+#venueChoices button b { display: block; font-family: 'Do Hyeon', sans-serif; font-size: 20px; font-weight: 400; }
+#venueChoices button span { color: var(--muted); font-size: 13px; }
+.vote { text-align: center; }
+.timer { height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden; }
+#voteTimer { height: 100%; background: var(--accent); width: 100%; }
+
+/* ---------- 영수증 ---------- */
+.receipt-wrap { display: flex; flex-direction: column; gap: 14px; width: min(360px, 100%); max-height: 92vh; }
+.receipt {
+  background: #fbf8f0; color: #222; font-family: 'Nanum Gothic Coding', monospace; font-size: 13px; line-height: 1.7; padding: 22px 18px 30px; overflow-y: auto; min-height: 0; flex: 0 1 auto;
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); animation: print 0.9s ease-out;
+}
+@keyframes print { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+.receipt h3 { text-align: center; margin: 0; font-size: 18px; }
+.receipt .c { text-align: center; }
+.receipt hr { border: 0; border-top: 1px dashed #999; margin: 10px 0; }
+.receipt .ln { display: flex; gap: 6px; }
+.receipt .ln .n { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.receipt .ln .who { color: #777; }
+.receipt .rd { font-weight: 700; margin: 8px 0 4px; }
+.receipt .tot { font-size: 17px; font-weight: 700; }
+.receipt .barcode { height: 40px; margin: 14px 8px 4px; background: repeating-linear-gradient(90deg, #222 0 2px, transparent 2px 4px, #222 4px 5px, transparent 5px 8px, #222 8px 11px, transparent 11px 12px); }
+
+@media (max-width: 640px) {
+  #hint { display: none; }
+  #feed { top: 150px; }
+  #chat { bottom: 84px; }
+  #chatLog { max-height: 22vh; }
+  #actions button, #actions .vol { min-width: 48px; padding: 6px; }
+  #actions .vol input { width: 50px; }
+}

@@ -1,0 +1,39 @@
+{
+  "pocha": {
+    "name": "을지로 야장",
+    "orderVerb": "주문",
+    "items": [
+      { "key": "soju", "name": "소주", "price": 5000, "kind": "drink", "servings": 7, "model": "soju", "liquid": "#dcefff" },
+      { "key": "beer", "name": "맥주", "price": 5000, "kind": "drink", "servings": 3, "model": "beer", "liquid": "#f2b233" },
+      { "key": "dakbal", "name": "닭발", "price": 18000, "kind": "food", "servings": 10, "model": "plate", "color": "#b3261e" },
+      { "key": "odol", "name": "오돌뼈", "price": 16000, "kind": "food", "servings": 10, "model": "plate", "color": "#8a3b1c" },
+      { "key": "egg", "name": "계란말이", "price": 12000, "kind": "food", "servings": 8, "model": "plate", "color": "#f2c94c" },
+      { "key": "eomuk", "name": "어묵탕", "price": 15000, "kind": "food", "servings": 8, "model": "bowl", "color": "#d9a066" },
+      { "key": "golbaengi", "name": "골뱅이무침", "price": 20000, "kind": "food", "servings": 10, "model": "plate", "color": "#d8572a" }
+    ]
+  },
+  "pub": {
+    "name": "시끌벅적 호프",
+    "orderVerb": "주문",
+    "items": [
+      { "key": "pitcher", "name": "생맥주 3000cc", "price": 18000, "kind": "drink", "servings": 6, "model": "pitcher", "liquid": "#f2b233" },
+      { "key": "soju", "name": "소주", "price": 5500, "kind": "drink", "servings": 7, "model": "soju", "liquid": "#dcefff" },
+      { "key": "chicken", "name": "후라이드치킨", "price": 21000, "kind": "food", "servings": 12, "model": "plate", "color": "#c98a3a" },
+      { "key": "fries", "name": "감자튀김", "price": 9000, "kind": "food", "servings": 10, "model": "plate", "color": "#f2d16b" },
+      { "key": "nogari", "name": "노가리", "price": 8000, "kind": "food", "servings": 8, "model": "plate", "color": "#c9b48a" },
+      { "key": "sotteok", "name": "소떡소떡", "price": 7000, "kind": "food", "servings": 6, "model": "plate", "color": "#a8452c" }
+    ]
+  },
+  "store": {
+    "name": "편의점 앞 파라솔",
+    "orderVerb": "사오기",
+    "items": [
+      { "key": "soju", "name": "소주", "price": 1900, "kind": "drink", "servings": 7, "model": "soju", "liquid": "#dcefff" },
+      { "key": "cans", "name": "캔맥주 4캔", "price": 11000, "kind": "drink", "servings": 4, "model": "cans", "liquid": "#f2b233" },
+      { "key": "shrimp", "name": "새우깡", "price": 1700, "kind": "food", "servings": 8, "model": "bag", "color": "#e8463a" },
+      { "key": "jerky", "name": "육포", "price": 4500, "kind": "food", "servings": 6, "model": "bag", "color": "#6b3d1f" },
+      { "key": "ramen", "name": "컵라면", "price": 1500, "kind": "food", "servings": 5, "model": "cupramen", "color": "#d63a2f" },
+      { "key": "kimbap", "name": "삼각김밥", "price": 1300, "kind": "food", "servings": 3, "model": "triangle", "color": "#1d2b1a" }
+    ]
+  }
+}
