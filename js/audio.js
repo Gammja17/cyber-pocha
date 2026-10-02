@@ -2,8 +2,25 @@
 const SOUNDS = [
   'ambient_pocha', 'ambient_pub', 'ambient_store',
   'chair_scrape', 'clink', 'pour', 'can_open', 'sip', 'bite', 'serve', 'call_bell',
-  'lighter', 'door_chime', 'plastic_bag', 'crowd_cheer', 'laugh', 'car_pass', 'footsteps', 'meow', 'hiccup',
+  'lighter', 'door_chime', 'plastic_bag', 'crowd_cheer', 'laugh', 'car_pass', 'footsteps', 'meow',
 ];
+
+// 원본이 긴 효과음은 쓸 구간만 재생: [시작초, 길이초] (여러 개면 랜덤)
+const CLIPS = {
+  chair_scrape: [[4.0, 2.0], [17.7, 1.6], [21.9, 1.6], [26.3, 1.8]],
+  clink: [[0.5, 0.9]],
+  pour: [[0, 2.5]],
+  sip: [[6.2, 1.0]],
+  bite: [[2.0, 0.9], [7.8, 0.9], [14.0, 0.9]],
+  serve: [[0.4, 1.0], [6.5, 1.0], [12.3, 1.2]],
+  call_bell: [[0, 2.0]],
+  lighter: [[0, 2.0]],
+  door_chime: [[0, 2.5]],
+  plastic_bag: [[2.0, 1.8], [9.8, 1.2]],
+  laugh: [[0, 3.0]],
+  car_pass: [[3.5, 6.0]],
+  footsteps: [[0, 3.0]],
+};
 
 // 장소별 분위기: 배경 루프 볼륨 + 가끔 나는 소리 [이름, 최소초, 최대초, 볼륨]
 const VENUE_SOUND = {
@@ -48,7 +65,17 @@ export class AudioManager {
     const g = this.ctx.createGain();
     g.gain.value = volume;
     src.connect(g).connect(out || this.master);
-    src.start(this.ctx.currentTime + delay);
+    const when = this.ctx.currentTime + delay;
+    const clips = CLIPS[name];
+    if (clips) {
+      const [offset, dur] = clips[Math.floor(Math.random() * clips.length)];
+      const len = dur / rate;
+      g.gain.setValueAtTime(volume, when + Math.max(0, len - 0.15)); // 끝을 살짝 페이드아웃 (뚝 끊김 방지)
+      g.gain.linearRampToValueAtTime(0, when + len);
+      src.start(when, offset, dur);
+    } else {
+      src.start(when);
+    }
     return src;
   }
 

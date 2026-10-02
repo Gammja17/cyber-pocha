@@ -73,12 +73,6 @@ function bindSocket() {
   socket.on('notice', (msg) => banner(msg));
   socket.on('receipt', showReceipt);
 
-  // 많이 취하면 가끔 딸꾹
-  setInterval(() => {
-    const me = state?.members.find((m) => m.id === myId);
-    if (me?.drunk >= 0.7 && !me.blackout && Math.random() < 0.3) audio.play('hiccup', { volume: 0.7, rate: 0.9 + Math.random() * 0.3 });
-  }, 4000);
-
   // 내 시선 방향 공유 (마주보기)
   let last = '';
   setInterval(() => {
