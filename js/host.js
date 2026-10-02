@@ -10,6 +10,11 @@ const CAT_STAY_MS = 15000;
 const CAT_MAX_MS = 40000;
 const CAT_OUT_MS = 4600; // 클라 퇴장 애니메이션 길이 (scene.js와 맞춤)
 const SEAT_ORDER = [0, 3, 1, 4, 2, 5]; // 2명이면 마주보게, 그다음부터 사이사이
+const SIP_DRUNK = 0.06;
+const SHOT_DRUNK = 0.15; // 짠 원샷 (잔 가득 기준)
+const FAST_DRINKS = 3; // 1분에 이보다 많이 마시면 1.5배
+const SOBER_STEP = 0.01; // 10초마다 깨는 양
+const BLACKOUT_MS = 3000;
 const COLORS = ['#e4572e', '#4c9be8', '#f3c13a', '#5fbf6a', '#b06ad9', '#ef7fb0'];
 
 export class PochaHost {
@@ -20,17 +25,26 @@ export class PochaHost {
     this.alive = true;
     this.room = snap ? restore(snap) : {
       code, venue: 'pocha', round: 1, members: {}, items: [], glasses: {}, ledger: [],
-      vote: null, toast: null, cat: null, history: [{ round: 1, venue: 'pocha' }], startedAt: Date.now(), nextItemId: 1,
+      vote: null, toast: null, cat: null, history: [{ round: 1, venue: 'pocha' }], startedAt: Date.now(), nextItemId: 1, drinks: {},
     };
     if (snap) {
       // 이어받을 때: 진행 중이던 타이머는 사라졌으니 정리
       if (this.room.vote) this.room.vote.timer = setTimeout(() => this.resolveVote(), Math.max(0, this.room.vote.endsAt - Date.now()) + 50);
       this.scheduleCat();
     }
+    // 시간 지나면 술이 깸
+    this.soberTimer = setInterval(() => {
+      let changed = false;
+      for (const m of Object.values(this.room.members)) {
+        if (m.drunk > 0 && !m.blackout) { m.drunk = Math.max(0, +(m.drunk - SOBER_STEP).toFixed(3)); changed = true; }
+      }
+      if (changed) this.broadcast();
+    }, 10000);
   }
 
   stop() {
     this.alive = false;
+    clearInterval(this.soberTimer);
     clearTimeout(this.room.catTimer);
     if (this.room.vote) clearTimeout(this.room.vote.timer);
   }
@@ -39,7 +53,7 @@ export class PochaHost {
     const r = this.room;
     return {
       code: r.code, venue: r.venue, round: r.round, members: r.members, items: r.items, glasses: r.glasses,
-      ledger: r.ledger, history: r.history, startedAt: r.startedAt, nextItemId: r.nextItemId,
+      ledger: r.ledger, history: r.history, startedAt: r.startedAt, nextItemId: r.nextItemId, drinks: r.drinks,
       vote: r.vote && { ...r.vote, timer: undefined },
     };
   }
@@ -168,6 +182,7 @@ export class PochaHost {
         ledger: room.ledger,
         history: room.history,
         members: Object.values(room.members).map((m) => m.name),
+        drinks: room.drinks,
         startedAt: room.startedAt,
         endedAt: Date.now(),
       });
@@ -175,6 +190,32 @@ export class PochaHost {
       return;
     }
     this.broadcast();
+  }
+
+  // ---------- 취기 ----------
+  drink(id, amount, glasses) {
+    const room = this.room;
+    const m = room.members[id];
+    if (!m || amount <= 0) return;
+    const now = Date.now();
+    m.recent = (m.recent || []).filter((t) => now - t < 60000);
+    m.recent.push(now);
+    const fast = m.recent.length > FAST_DRINKS ? 1.5 : 1; // 빨리 마시면 더 취함
+    m.drunk = Math.min(1, (m.drunk || 0) + amount * fast);
+    room.drinks[m.name] = +((room.drinks[m.name] || 0) + glasses).toFixed(2);
+    if (m.drunk >= 1 && !m.blackout) this.blackout(m);
+  }
+
+  blackout(m) {
+    m.blackout = true;
+    this.fx({ type: 'blackout', id: m.id, name: m.name });
+    this.later(BLACKOUT_MS, () => {
+      if (!this.room.members[m.id]) return;
+      m.blackout = false;
+      m.drunk = 0.7; // 정신 차림 (아직 취함)
+      this.fx({ type: 'wake', id: m.id, name: m.name });
+      this.broadcast();
+    });
   }
 
   // ---------- 손님 요청 처리 ----------
@@ -242,7 +283,9 @@ export class PochaHost {
       case 'sip': {
         const g = room.glasses[id];
         if (!g || g.fill <= 0 || me.away) return;
+        const sipped = Math.min(g.fill, 0.34);
         g.fill = Math.max(0, +(g.fill - 0.34).toFixed(2));
+        this.drink(id, SIP_DRUNK * (sipped / 0.34), sipped);
         this.fx({ type: 'sip', id });
         this.broadcast();
         break;
@@ -261,7 +304,12 @@ export class PochaHost {
           if (room.toast !== toast) return;
           room.toast = null;
           const joined = toast.joined.filter((pid) => room.members[pid]);
-          for (const pid of joined) if (room.glasses[pid]) room.glasses[pid].fill = 0;
+          for (const pid of joined) {
+            const g = room.glasses[pid];
+            if (!g) continue;
+            this.drink(pid, SHOT_DRUNK * g.fill, g.fill); // 원샷
+            g.fill = 0;
+          }
           this.fx({ type: 'cheers', ids: joined });
           this.broadcast();
         });
@@ -325,7 +373,7 @@ export class PochaHost {
     const taken = new Set(Object.values(room.members).map((m) => m.seat));
     const seat = SEAT_ORDER.find((s) => !taken.has(s));
     if (seat === undefined || Object.keys(room.members).length >= MAX_MEMBERS) return this.out.toPeer(id, 'notice', '자리가 꽉 찼어요 (최대 6명)');
-    room.members[id] = { id, name, seat, color: COLORS[seat], away: null, smoking: false };
+    room.members[id] = { id, name, seat, color: COLORS[seat], away: null, smoking: false, drunk: 0, blackout: false };
     this.out.toPeer(id, 'joined', { id, code: room.code });
     this.fx({ type: 'join', id, name });
     this.broadcast();
@@ -347,6 +395,7 @@ function restore(snap) {
   const room = structuredClone(snap);
   room.toast = null;
   room.cat = null;
-  for (const m of Object.values(room.members)) { m.away = null; m.smoking = false; }
+  for (const m of Object.values(room.members)) { m.away = null; m.smoking = false; m.blackout = false; }
+  room.drinks ||= {};
   return room;
 }

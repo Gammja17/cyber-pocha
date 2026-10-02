@@ -24,6 +24,7 @@
 | `crowd_cheer.mp3` | 다른 테이블 "위하여~!" | `crowd cheer small`, `toast cheers group` |
 | `laugh.mp3` | 다른 테이블 웃음 | `group laughter` |
 | `car_pass.mp3` | 지나가는 차 | `car pass by night` |
+| `hiccup.mp3` | 많이 취했을 때 딸꾹 | `hiccup` |
 | `meow.mp3` | 편의점 길고양이 야옹 | `cat meow` |
 | `footsteps.mp3` | 걷는 소리 (2차 이동, 편의점 갈 때) | `footsteps street` |
 

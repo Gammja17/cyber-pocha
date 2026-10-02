@@ -39,6 +39,13 @@ input:focus { border-color: var(--accent); }
 #app { position: fixed; inset: 0; }
 #view { position: absolute; inset: 0; }
 #view canvas { display: block; touch-action: none; cursor: grab; }
+/* 취기 */
+#view .ghost { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; display: none; }
+#view.drunk canvas { filter: blur(calc((var(--d) - 0.65) * 5px)) saturate(1.3); }
+#view::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1s; box-shadow: inset 0 0 220px 80px rgba(20, 0, 10, 0.85); }
+#view.drunk::after { opacity: calc((var(--d) - 0.6) * 2.5); }
+#blackout { position: absolute; inset: 0; background: #000; display: grid; place-items: center; font-family: 'Do Hyeon', sans-serif; font-size: 30px; color: #aaa; opacity: 0; pointer-events: none; transition: opacity 0.6s; z-index: 5; text-align: center; padding: 16px; }
+#blackout.on { opacity: 1; transition: opacity 1.2s; }
 #fade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; transition: opacity 0.8s; }
 #fade.on { opacity: 1; }
 

@@ -73,6 +73,12 @@ function bindSocket() {
   socket.on('notice', (msg) => banner(msg));
   socket.on('receipt', showReceipt);
 
+  // 많이 취하면 가끔 딸꾹
+  setInterval(() => {
+    const me = state?.members.find((m) => m.id === myId);
+    if (me?.drunk >= 0.7 && !me.blackout && Math.random() < 0.3) audio.play('hiccup', { volume: 0.7, rate: 0.9 + Math.random() * 0.3 });
+  }, 4000);
+
   // 내 시선 방향 공유 (마주보기)
   let last = '';
   setInterval(() => {
@@ -183,6 +189,19 @@ function onFx(f) {
       break;
     case 'moved':
       moveTransition(f);
+      break;
+    case 'blackout':
+      feed(`${f.name} 님 필름 끊김 💫`);
+      if (f.id === myId) {
+        $('#blackout').textContent = '';
+        $('#blackout').classList.add('on');
+      }
+      break;
+    case 'wake':
+      if (f.id === myId) {
+        $('#blackout').textContent = '…어? 여기 어디';
+        setTimeout(() => $('#blackout').classList.remove('on'), 1200);
+      }
       break;
     case 'cat_come':
       P('meow', { volume: 0.6 });
@@ -391,6 +410,8 @@ function showReceipt(r) {
     html += `<div class="ln"><span class="n">${esc(who)}</span><span>${sum.toLocaleString()}</span></div>`;
   }
   html += `<hr><div class="ln tot"><span class="n">1/N (${n}명)</span><span>${won(Math.ceil(total / n / 100) * 100)}</span></div>`;
+  const king = Object.entries(r.drinks || {}).sort((a, b) => b[1] - a[1])[0];
+  if (king && king[1] > 0) html += `<hr><div class="c">🏆 오늘의 주량왕: <b>${esc(king[0])}</b> (${king[1].toFixed(1)}잔)</div>`;
   html += `<hr><div class="c">함께한 사람: ${r.members.map(esc).join(', ')}</div>`;
   html += `<div class="barcode"></div><div class="c">감사합니다 또 오세요~ 🍶</div>`;
   $('#receipt').innerHTML = html;

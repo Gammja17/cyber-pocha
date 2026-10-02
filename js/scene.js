@@ -59,6 +59,13 @@ export class BarScene {
     this.camera.add(this.myCig);
 
     this.smokeTex = makeSmokeTexture();
+    // 취기: 겹쳐 보이는 효과용 오버레이 캔버스
+    this.drunk = 0;
+    this.drunkView = 0;
+    this.ghost = document.createElement('canvas');
+    this.ghost.className = 'ghost';
+    this.ghostCtx = this.ghost.getContext('2d');
+    container.appendChild(this.ghost);
     this.heartTex = makeEmojiTexture('💗');
     this.setupInput();
     addEventListener('resize', () => this.resize());
@@ -70,6 +77,8 @@ export class BarScene {
   resize() {
     const { clientWidth: w, clientHeight: h } = this.renderer.domElement.parentElement;
     this.renderer.setSize(w, h);
+    this.ghost.width = this.renderer.domElement.width;
+    this.ghost.height = this.renderer.domElement.height;
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
   }
@@ -178,7 +187,9 @@ export class BarScene {
       av.group.rotation.y = a;
       const away = !!m.away;
       av.group.children.forEach((c) => { if (c !== av.label && c !== av.bubble) c.visible = !away; });
-      const labelText = away ? `${m.name} ${STATUS[m.away]}` : m.name;
+      const labelText = (away ? `${m.name} ${STATUS[m.away]}` : m.name) + (m.drunk >= 0.7 ? ' 🥴' : '');
+      av.drunk = m.drunk || 0;
+      av.blush.forEach((b) => (b.material.opacity = Math.min(0.85, av.drunk * 1.1)));
       if (labelText !== av.lastLabel) { av.label.setText(labelText); av.lastLabel = labelText; }
       av.cig.visible = m.smoking && !away;
       av.smoking = av.cig.visible;
@@ -187,6 +198,7 @@ export class BarScene {
       if (!present.has(id)) { this.scene.remove(av.group); this.avatars.delete(id); }
     }
     this.myCig.visible = !!(me && me.smoking && !me.away);
+    this.drunk = me?.drunk || 0;
     this.updateCamera();
 
     // 앉거나 일어나면 의자가 뒤로 쓱 밀림 (크르륵)
@@ -236,8 +248,12 @@ export class BarScene {
   updateCamera() {
     const a = seatAngle(this.mySeat);
     this.camera.position.set(Math.sin(a) * (SEAT_R + 0.05), EYE_Y, Math.cos(a) * (SEAT_R + 0.05));
-    this.camera.rotation.y = a + this.yaw;
-    this.camera.rotation.x = BASE_PITCH + this.pitch;
+    // 취하면 시야가 흔들리고 고개가 기울어짐
+    const d = this.drunkView > 0.3 ? (this.drunkView - 0.3) / 0.7 : 0;
+    const t = performance.now() / 1000;
+    this.camera.rotation.y = a + this.yaw + Math.sin(t * 0.43) * 0.08 * d;
+    this.camera.rotation.x = BASE_PITCH + this.pitch + Math.sin(t * 0.61) * 0.04 * d;
+    this.camera.rotation.z = Math.sin(t * 0.7) * 0.1 * d;
   }
 
   // ---------------- 이펙트 ----------------
@@ -411,6 +427,9 @@ export class BarScene {
       av.head.rotation.x += (look.pitch - av.head.rotation.x) * 0.15;
       av.torso.rotation.y = av.head.rotation.y * 0.3;
       av.torso.scale.y = 1 + Math.sin(t * 2 + av.group.position.x) * 0.012;
+      const sway = Math.max(0, av.drunk - 0.4) * 0.25; // 취하면 몸이 흔들흔들
+      av.torso.rotation.z = Math.sin(t * 1.1 + av.group.position.z) * sway;
+      av.head.rotation.z = Math.sin(t * 0.9 + av.group.position.x) * sway * 1.5;
       const lvl = this.talk.get(id) || 0;
       av.mouth.scale.y += (1 + lvl * 6 - av.mouth.scale.y) * 0.4;
       av.tip.material.color.setHSL(0.04, 1, 0.45 + Math.sin(t * 5) * 0.1);
@@ -453,6 +472,23 @@ export class BarScene {
     });
 
     this.renderer.render(this.scene, this.camera);
+
+    // 겹쳐 보임 (취기 0.5 이상): 방금 그린 프레임을 반투명하게 옆으로 흔들어 덧그림
+    this.drunkView += (this.drunk - this.drunkView) * Math.min(1, dt * 0.8);
+    const dv = this.drunkView;
+    const container = this.renderer.domElement.parentElement;
+    container.style.setProperty('--d', dv.toFixed(3));
+    container.classList.toggle('drunk', dv >= 0.65);
+    if (dv > 0.5) {
+      this.ghostCtx.clearRect(0, 0, this.ghost.width, this.ghost.height);
+      this.ghostCtx.drawImage(this.renderer.domElement, 0, 0);
+      const k = (dv - 0.5) / 0.5;
+      this.ghost.style.opacity = (0.15 + k * 0.3).toFixed(2);
+      this.ghost.style.transform = `translate(${(Math.sin(t * 1.3) * 10 + 6) * k}px, ${Math.sin(t * 0.9) * 4 * k}px)`;
+      this.ghost.style.display = 'block';
+    } else {
+      this.ghost.style.display = 'none';
+    }
   }
 }
 

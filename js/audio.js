@@ -2,7 +2,7 @@
 const SOUNDS = [
   'ambient_pocha', 'ambient_pub', 'ambient_store',
   'chair_scrape', 'clink', 'pour', 'can_open', 'sip', 'bite', 'serve', 'call_bell',
-  'lighter', 'door_chime', 'plastic_bag', 'crowd_cheer', 'laugh', 'car_pass', 'footsteps', 'meow',
+  'lighter', 'door_chime', 'plastic_bag', 'crowd_cheer', 'laugh', 'car_pass', 'footsteps', 'meow', 'hiccup',
 ];
 
 // 장소별 분위기: 배경 루프 볼륨 + 가끔 나는 소리 [이름, 최소초, 최대초, 볼륨]
