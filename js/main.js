@@ -280,6 +280,7 @@ function feed(text) {
 document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => (b.closest('.modal').hidden = true)));
 
 $('#orderBtn').addEventListener('click', () => {
+  if (!state) return banner('아직 친구들 찾는 중… 잠깐만!'); // 방장 연결 전
   cart = {};
   $('#menuTitle').textContent = state.venue === 'store' ? '🏪 뭐 사올까?' : '🍽️ 메뉴판';
   $('#orderSubmit').textContent = state.venue === 'store' ? '사러 가기' : '주문하기';
@@ -315,6 +316,7 @@ $('#toastBtn').addEventListener('click', () => socket.emit('toast'));
 $('#smokeBtn').addEventListener('click', () => socket.emit('smoke'));
 
 $('#moveBtn').addEventListener('click', () => {
+  if (!state) return banner('아직 친구들 찾는 중… 잠깐만!');
   $('#venueChoices').innerHTML = Object.keys(menu).filter((k) => k !== state.venue)
     .map((k) => `<button data-v="${k}"><b>${menu[k].name}</b><span>${VENUE_DESC[k]}</span></button>`).join('');
   $('#moveModal').hidden = false;
